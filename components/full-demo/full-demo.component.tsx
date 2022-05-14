@@ -1,25 +1,41 @@
-import React, {useState, useCallback, useMemo, useEffect} from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useContext } from 'react';
 import _ from 'lodash';
+import { LogoContext } from '../logo';
 
 export const FullDemo = () => {
+
+  // useState (https://reactjs.org/docs/hooks-reference.html#usestate)
   const [name, setName] = useState('');
   const [inputValue, changeInputValue] = useState('');
 
-  const handleChangeInput = useCallback((e) => {
-    changeInputValue(e?.target?.value ?? '')
-  }, [changeInputValue]);
+  // useContext (https://reactjs.org/docs/hooks-reference.html#usecontext)
+  const {animateLogoCallback} = useContext(LogoContext);
 
+  // useCallback (https://reactjs.org/docs/hooks-reference.html#usecallback)
+  const handleChangeInput = useCallback(
+    (e) => {
+      changeInputValue(e?.target?.value ?? '')
+    }
+    , [changeInputValue]);
   const changeHeading = useCallback((e) => {
     e?.preventDefault();
     setName(inputValue);
-  }, [inputValue, setName]);
 
-  // const calculatedNum = useMemo(() => {
-  //   return _.reduce(_.range(10, 1), (result, value) => {
-  //     return result * value;
-  //   }, 1)
-  // }, []);
+    if (_.isFunction(animateLogoCallback)) {
+      animateLogoCallback();
+    }
+  }, [inputValue, setName, animateLogoCallback]);
 
+  // useMemo (https://reactjs.org/docs/hooks-reference.html#usememo)
+  const calculatedNum = useMemo(() => {
+    // some compute-intense thing
+    return _.reduce(_.range(name?.length, 1), (result, value) => {
+      return result * value;
+    }, 1);
+  }, [name]);
+
+  // useEffect (https://reactjs.org/docs/hooks-reference.html#useeffect)
+  // this popup can get annoying
   // useEffect(() => {
   //   setTimeout(() => {
   //     alert('side effect')
@@ -33,19 +49,19 @@ export const FullDemo = () => {
         <div className={'flex-auto mr-4'} >
           <input
             onInput={handleChangeInput}
-            className={'text-lg text-black p-3 w-full rounded-lg'} />
+            placeholder={'Type anything'}
+            className={'text-lg text-black p-3 w-full rounded-lg border-black border-4'} />
         </div>
         <div className={'flex-initial '} >
           <button
             type={'submit'}
             onClick={changeHeading}
-            onSubmit={changeHeading}
-            className={'text-lg text-black rounded-lg p-2 h-full bg-sky-300'}
+            className={'text-lg text-black rounded-lg border-black border-4 p-2 h-full bg-sky-300'}
           >
             Submit
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 };
